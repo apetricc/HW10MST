@@ -1,28 +1,27 @@
-/*
- * Header comment goes here.
+/**
+ * Andrew Petriccione
+ * CSCI 333 Fall 2015
+ * Professor Whitley
+ * Homework 10: Prim's Minimum Spanning Tree Algorithm
+ * The point of this assignment is to create a graph
+ * from which we can create a minimum spanning tree
+ * using Prim's algorithm.
  */
 package hw10mst;
 
-
-/*
-15 points: In main, test your Graph class by performing Prim's MST algorithm 
-on a Graph.
-Manually initialize at least one 2D Edge array of the weighted adjacency 
-matrix of a fully connected weighted graph with at least 5 vertices. 
-You may want to draw the graph on paper first, then write down the weighted 
-adjacency matrix, then write the code to initialize it.
-Construct a Graph object, and perform Prim's MST algorithm. Afterward, 
-you'll want to printGraph and also print out all the vertices.  
-(By reading all the parent labels in the Vertex print statements, you could 
-draw the breadth-first tree on paper to make sure it's working correctly.)
-
-*/
+/**
+ * Test your Graph class by performing Prim's MST algorithm on a Graph. Manually
+ * initialize at least one 2D Edge array of the weighted adjacency matrix of a
+ * fully connected weighted graph with at least 5 vertices. Construct a Graph
+ * object, and perform Prim's MST algorithm. Afterward, call printGraph and also
+ * print out all the vertices.
+ */
 public class HW10MST {
 
     public static void main(String[] args) {
 
         Edge[][] myEdges = {
-            {new Edge(), new Edge(3), new Edge(7),new Edge(), new Edge(8)},
+            {new Edge(), new Edge(3), new Edge(7), new Edge(), new Edge(8)},
             {new Edge(3), new Edge(), new Edge(5), new Edge(), new Edge()},
             {new Edge(7), new Edge(5), new Edge(), new Edge(9), new Edge(2)},
             {new Edge(), new Edge(), new Edge(9), new Edge(), new Edge()},
@@ -41,6 +40,6 @@ public class HW10MST {
             }
             System.out.println();
         }
-        
+
     }
 }
