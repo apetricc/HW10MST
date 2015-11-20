@@ -1,154 +1,109 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * Andrew Petriccione
+ * Csci 333 Fall 2015
+ * Professor Whitley
+ * Homework 9: Breadth First Search
+ * The point of this assignment is to implement Graph class
+ * that we can perform a breadth first search on.
  */
-package hw10mst;
-
-import java.util.PriorityQueue;
+//package hw9bfs;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
- *
- * @author awhitley
+ * 45 points: Define a class named Graph to represent a graph, in a fashion
+ * conducive to breadth-first searching. Private Data fields will be: "n", an
+ * int for the number of vertices in the graph. "edges", a 2D boolean array of
+ * size n-by-n, to store an adjacency matrix. "vertices", a length-n array of
+ * Vertex, to store information about each vertex. "queue", a LinkedList<Vertex>
+ * to be used only for queue operations. (The LinkedList class conveniently
+ * implements the Queue Java Interface.) You'll want to make a public getter
+ * method for n. You'll also want a public getter method for a Vertex, with a
+ * parameter index i indicating the Vertex label to return. e.g. getVertex(3)
+ * would return the Vertex handle whose label is 3. The constructor will take a
+ * 2D boolean square array (that means the same length in both dimensions), as a
+ * parameter. You may assume the matrix is square. The constructor should
+ * construct an empty LinkedList for your queue, initialize the n data field,
+ * copy the entire parameter 2D array into a brand new copy for your edges data
+ * field, and init and construct your array of vertices with labels 0 through
+ * n-1. Define a printGraph class method to print n, and then a nicely formatted
+ * table of the adjacency matrix. Define a breadthFirstSearch class method, to
+ * perform a breadth-first search. The only parameter sourceLabel is a number
+ * between 0 and n-1, the label of the source vertex. You will want to create a
+ * local Vertex handle s, set to element sourceLabel of your Vertex array, right
+ * away. You will also want to use the Queue Java interface methods offer
+ * (that's your ENQUEUE), poll (that's your DEQUEUE), and peek, on your queue.
  */
 
-/*
-Your assignment is the following:
-
-45 points: Define a class named Graph to represent a graph, in a fashion 
-conducive to Prim's MST algorithm.
-Private Data fields will be: n, an int for the number of vertices in the graph.
-edges, a 2D array of Edge with size n-by-n, to store an adjacency matrix of Edge 
-objects.  vertices, a length-n array of Vertex, to store information about each 
-vertex.
-You'll want to make a public getter method for n.  
-
-You'll also want a public 
-getter method for a Vertex, with a parameter index i indicating the Vertex label
-to return.  e.g. getVertex(3) would return the Vertex handle whose label is 3. 
-Also, make a getter method for an Edge, with two index parameters.
-
-********
-The constructor will take a square adjacency matrix parameter, as a 2D Edge 
-array. You may assume the matrix is square. The constructor should initialize 
-the n data field, assign the parameter Edge array to your edges data field, 
-and init and construct your vertices data field of Vertex objects, with 
-labels 0 through n-1.
-**
-***
-Define a printGraph class method to print n, and then a nicely formatted table 
-of the adjacency matrix's edges. The Edge class has a convenient toString 
-method allowing you to insert an Edge object directly into a print statement.
-**
-Define a primMST class method with no parameters, to perform Prim's MST 
-algorithm and calculate a min spanning tree. It will set the p data fields 
-of your vertices to indicate the tree structure. Use your edges and vertices 
-data fields. Use Vertex 0 as the source. You will want to create a local 
-PriorityQueue<Vertex>.
-15 points: In main, test your Graph class by performing Prim's MST algorithm 
-on a Graph.
-Manually initialize at least one 2D Edge array of the weighted adjacency 
-matrix of a fully connected weighted graph with at least 5 vertices. 
-You may want to draw the graph on paper first, then write down the weighted 
-adjacency matrix, then write the code to initialize it.
-Construct a Graph object, and perform Prim's MST algorithm. Afterward, 
-you'll want to printGraph and also print out all the vertices.  
-(By reading all the parent labels in the Vertex print statements, you could 
-draw the breadth-first tree on paper to make sure it's working correctly.)
-*/
+/**
+ * The Graph class creates an undirected graph from an adjacency matrix
+ * and has methods to get the number of vertices, retrieve a given vertex,
+ * print the graph, and perform a breadth first search of the graph.
+ */
 public class Graph {
+
     private int n;
-    
-    private Vertex[] vertices; 
-    private Edge[][] edges;
-    // ----- Data Fields -----
-    // DO NOT rename me without Refactor --> Rename, or you'll break decreaseKey.
-    // You need to declare the other data fields, too!
-    // You need to define all the constructor(s) and other class methods, too!
-    // ----- Private Helper Methods -----
-/*
-    The constructor will take a square adjacency matrix parameter, as a 2D Edge 
-array. You may assume the matrix is square. The constructor should initialize 
-the n data field, assign the parameter Edge array to your edges data field, 
-and init and construct your vertices data field of Vertex objects, with 
-labels 0 through n-1.
+    private boolean[][] edges;
+    private Vertex[] vertices;
+    private Queue<Vertex> queue;
 
-    */
-    public Graph(Edge[][] edges) {
-        this.edges = edges;
+    /**
+     * The constructor for a new Graph uses a queue for the vertices,
+     * and a boolean 2D array for the edges.
+     * @param edges the adjacency matrix of the graph
+     */
+    public Graph(boolean[][] edges) {
         this.n = edges.length;
-        this.vertices = new Vertex[n];
+        queue = new LinkedList<Vertex>();
+        this.edges = new boolean[n][n];
         for (int i = 0; i < n; i++) {
-            vertices[i] = new Vertex(i, Edge.INFINITE_WEIGHT);
+            for (int j = 0; j < n; j++) {
+                this.edges[i][j] = edges[i][j];
+            }
         }
-    }
-    
-    /*
-    Define a printGraph class method to print n, and then a nicely formatted table 
-of the adjacency matrix's edges. The Edge class has a convenient toString 
-method allowing you to insert an Edge object directly into a print statement.
-
-    */
-public void printGraph() {
-    System.out.println("N is: "+n);
-    for (int i = 0; i < n; i++) {
-        
-        for (int j = 0; j < n; j++) {
-            System.out.print(edges[i][j] + "\t");            
+        vertices = new Vertex[n];
+        for (int i = 0; i < n; i++) {
+            vertices[i] = new Vertex(i);
         }
-        System.out.println();
-    }
-    
-}    
-  /*
-Define a primMST class method with no parameters, to perform Prim's MST 
-algorithm and calculate a min spanning tree. It will set the p data fields 
-of your vertices to indicate the tree structure. Use your edges and vertices 
-data fields. Use Vertex 0 as the source. You will want to create a local 
-PriorityQueue<Vertex>.
-*/ 
-/*
-PRIM-MINIMUM-SPANNING-TREE(G, w, r) // graph G, weight function w, source vertex r
-for each vertex u in G // init null parents and infinite keys
-   u.key = INFINITY
-   u.p = NULL
-r.key = 0
-Let Q be a new priority queue containing all vertices V of G
-while Q is not empty
-   u = EXTRACT-MIN(Q)
-   for each vertex v adjacent to u
-      if v is still stored in Q and w(u, v) < v.key // we can get to it cheaper
-         v.p = u // (u, v) is cheapest edge known so far to connect v to the MST
-         DECREASE-KEY(Q, v, w(u,v)) // key of v decreased to edge weight (u, v)
+    }//Graph constructor
 
-*/
-public void primMST() {
-//r is the source   
-    Vertex u;
-    PriorityQueue<Vertex> Q = new PriorityQueue<>();
-    for(Vertex vertex : vertices) {
-        vertex.setKey(Edge.INFINITE_WEIGHT);
-        vertex.setParent(null);
-        Q.add(vertex);
+    /**
+     * The getN method returns the number of vertices, n.
+     * @return the number of vertices
+     */
+    public int getN() {
+        return n;
     }
-    vertices[0].setKey(0);
-    while(!Q.isEmpty()) {
-        u = Q.poll();
-        for (int i = 0; i < n;i++) {
-            if(edges[u.getLabel()][i].getExists()) {
-                if(isStillInQ(Q,vertices[i].getLabel()) && edges[u.getLabel()] [i].getWeight() < vertices[i].getKey()) {
-                    vertices[i].setParent(u);
-                    decreaseKey(Q,vertices[i].getLabel(),edges[u.getLabel()][i].getWeight());
-                }
+
+    /**
+     * getVertex returns the vertex with the key given
+     * @param i the key of the vertex to return
+     * @return the vertex with the key requested
+     */
+    public Vertex getVertex(int i) {
+        return vertices[i];
+    }
+
+    /**
+     * printGraph prints the number of vertices
+     * then prints the boolean adjacency matrix using 1 for true
+     * and 0 for false.
+     */
+    public void printGraph() {
+        System.out.println("The graph has " + n + " vertices.");
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (edges[i][j])
+                    System.out.print(1 + " ");
+                if (!edges[i][j])
+                    System.out.print(0 + " ");
+                if (j == (n - 1)) System.out.println();
+
             }
         }
     }
-    printVertices();
-    System.out.println();
-}
- 
 
-/**
+    /**
      * printVertices prints all the Vertex objects and their contents
      * in the graph it is called upon.
      */
@@ -157,97 +112,49 @@ public void primMST() {
             System.out.println("Here is vertex " + i + " " + getVertex(i));
         }
     }
-    
-    
-    
     /**
-     * Tells you whether a Vertex with the provided label is still in the queue
-     * q. This is needed because, since the PriorityQueue is keyed on key not
-     * label, it will tell you whether a given key is still in it, but not
-     * whether a given label is still in it.
-     *
-     * @param q a PriorityQueue<Vertex>
-     * @param label The Vertex label to check for.
-     * @return Returns true if a Vertex with matching label is in q. Returns
-     * false if no Vertex with matching label is in q.
+     * breadthFirstSearch performs a breadth first search of the graph
+     * it is called upon, updating the Vertex objects in the graph as
+     * it goes.
+     * @param sourceLabel the label of the vertex to use as the source of the search
+     * @throws Exception in the case of a non-existent vertex, exception is thrown
      */
-    private boolean isStillInQ(PriorityQueue<Vertex> q, int label) {
+    public void breadthFirstSearch(int sourceLabel) throws Exception {
+        Vertex s = null;
+        for (int i = 0; i < n; i++) {
+            getVertex(i).setColor(Vertex.WHITE);
+            //getVertex(i).setDistance(Vertex.INFINITY);
+            getVertex(i).setParent(null);
+            if (getVertex(i).getLabel() == sourceLabel) {
+                s = getVertex(i);
+            }
+        }
+        if (s == null) {
+            System.out.println("Label not a vaild key, unable to perform breadth first search...");
+            return;
+        }
+        s.setColor(Vertex.GRAY);
+        s.setDistance(0);
+        s.setParent(null);
+        //Queue<Vertex> Q = new LinkedList<Vertex>();
+        queue.offer(s);  //enqueue or add
 
-        Vertex[] array = q.toArray(new Vertex[0]); // dump out an array of the elements
-
-        // traverse the array of elements, searching for a matching label
-        for (int i = 0; i < array.length; i++) {
-            if ((array[i]).getLabel() == label) {
-                return true;
+        while (queue.size() != 0) {
+            Vertex u = queue.poll();//Q.remove();
+            int label = u.getLabel();
+            u.setColor(Vertex.BLACK);
+            for (int i = 0; i < n; i++) {  //need use edges array to determine if adjacent first
+                //for (int j = 0; j < n; j++) {
+                if (edges[label][i] && i != label) {
+                    if (getVertex(i).getColor() == Vertex.WHITE) {
+                        getVertex(i).setColor(Vertex.GRAY);
+                        getVertex(i).setDistance(u.getDistance() + 1);
+                        getVertex(i).setParent(u);
+                        queue.offer(getVertex(i));
+                    }
+                }
             }
         }
 
-        return false; // no matching label found
-
-    }
-
-    /**
-     * Takes the Vertex with matching label in queue q, and reduces its key to
-     * newKey. Will return false if Vertex is not in the queue, or newKey is
-     * larger than old key. Will return true if it successfully reduced the key.
-     *
-     * @param q The priority queue of Vertex
-     * @param label The label of the Vertex whose key you want to decrease
-     * @param newKey
-     * @return Returns false if the Vertex with the given label is not in the
-     * queue. Returns false if the newKey is larger than the old key of Vertex
-     * with given label. Returns true otherwise; the vertex with the given label
-     * had its key changed to newKey.
-     */
-    private boolean decreaseKey(PriorityQueue<Vertex> q, int label, int newKey) {
-        // PAY NO ATTENTION TO THE CODE BEHIND THAT CURTAIN! ;)
-        // Don't worry about the code in this method body. Read the Javadoc above.
-
-        int indexOfVertex = -1;
-        Vertex[] array = q.toArray(new Vertex[0]);
-
-        // check to see if Vertex with the given label is in the Priority queue.
-        for (int i = 0; i < array.length; i++) {
-            if ((array[i]).getLabel() == label) {
-                indexOfVertex = i;
-            }
-        }
-
-        // if Vertex with the given label is not in the queue, do nothing and return false
-        // also returns false if the new key is larger than the old key.
-        if (indexOfVertex == -1 || newKey > array[indexOfVertex].getKey()) {
-            return false;
-        }
-
-        // Without decreaseKey already in the PriorityQueue class,
-        // I must remove the vertex and add it again with a different key. 
-        // Actually, I'm emptying the queue, then I am inserting all the other
-        // vertices back in, except the one being decreased. Then I am reinserting
-        // the decreased vertex, with the newKey key value.
-        // I had to resort to this because technically you can't remove 
-        // an element from a PriorityQueue by its label, since it is keyed on something else.
-        Vertex vertexToDecrease = array[indexOfVertex];
-        vertexToDecrease.setKey(newKey);
-
-        // clear and rebuild the priority queue
-        q.clear();
-        for (int i = 0; i < array.length; i++) { // add everything else
-            if (i != indexOfVertex) { // not including the old vertex to be reduced
-                q.add(array[i]);
-            }
-        }
-        q.add(vertexToDecrease); // insert the decreased vertex back in
-
-        return true; // queue is now effectively identical to before, but with one Vertex's key reduced to newKey
-    }//decreaseKey method
-    
-    public int getN() {
-        return n;
-    }
-    public Vertex getVertex(int i) {
-        return vertices[i];
-    }
-    public Edge getEdge(int u, int v) {
-        return edges[u][v]; 
     }
 }
